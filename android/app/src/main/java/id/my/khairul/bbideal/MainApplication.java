@@ -1,4 +1,4 @@
-package com.bmicalc;
+package id.my.khairul.bbideal;
 
 import android.app.Application;
 

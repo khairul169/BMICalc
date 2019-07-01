@@ -1,4 +1,4 @@
-package com.bmicalc;
+package id.my.khairul.bbideal;
 
 import com.facebook.react.ReactActivity;
 
@@ -10,6 +10,6 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "BMICalc";
+        return "bbideal";
     }
 }
