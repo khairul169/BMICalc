@@ -1,27 +1,38 @@
 import React from 'react';
-import {View, Image} from 'react-native';
+import {View, Image, TouchableOpacity, Linking} from 'react-native';
 import {
 	Container, Header, Body, Title, Content, Text,
 	Form, Item, Input, Icon, Button, Card, Left, Right
 } from 'native-base';
 import * as Progress from 'react-native-progress';
 
+const appUrl = "http://khairul.my.id/bbideal/";
+
 const clamp = (value, min, max) => {
 	return Math.min(Math.max(value, min), max);
 }
 
 class AppHeader extends React.Component {
+	openWebsite = () => {
+		//
+		Linking.openURL(appUrl);
+	}
+
 	render() {
 		return (
 			<Header noShadow androidStatusBarColor="#4087ad" iosBarStyle="light-content" style={{backgroundColor: '#4087ad'}}>
-				<Left style={{flex: 1}} />
-				<Body style={{flex: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-					<Image source={require('../assets/weight-icon.png')} style={{width: 32, height: 32, marginRight: 16}} />
-					<Title style={{color: '#fff', textAlign: 'center'}}>{this.props.title}</Title>
+				<Left style={{flex: 2, alignItems: 'center'}}>
+					<Image source={require('../assets/weight-icon.png')} style={{width: 28, height: 28, marginRight: 16}} />
+				</Left>
+
+				<Body style={{flex: 9}}>
+					<Title style={{color: '#fff'}}>{this.props.title}</Title>
 				</Body>
 
 				<Right style={{flex: 1}}>
-					<Icon name='ios-help-circle' style={{color: '#fff'}} />
+					<TouchableOpacity onPress={this.openWebsite}>
+						<Icon name='ios-help-circle' style={{color: '#fff'}} />
+					</TouchableOpacity>
 				</Right>
 			</Header>
 		);
@@ -35,6 +46,7 @@ export default class Home extends React.Component {
 		this.state = {
 			beratBadan: null,
 			tinggiBadan: null,
+			showError: false,
 			imt: null,
 			bbIdeal: null
 		};
@@ -49,10 +61,11 @@ export default class Home extends React.Component {
 			const tb = clamp(parseFloat(this.state.tinggiBadan), 10.0, 200.0);
 			
 			indeksMassa = (bb / ((tb / 100.0) * (tb / 100.0))).toFixed(2);
-			bbIdeal = ((tb - 100.0) - ((tb - 100) * 0.1)).toFixed(1);
+			bbIdeal = clamp((tb - 100.0) - ((tb - 100) * 0.1), 0.0, 100.0).toFixed(1);
 		}
 
 		this.setState({
+			showError: true,
 			imt: indeksMassa,
 			bbIdeal: bbIdeal,
 		});
@@ -91,9 +104,9 @@ export default class Home extends React.Component {
 			<Container>
 				<AppHeader title="Berat Badan Ideal" />
 				
-				<Content padder>
+				<Content padder keyboardShouldPersistTaps='handled'>
 					<View style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center'}}>
-						<Image source={require('../assets/weight-icon.png')}
+						<Image source={require('../assets/bmi-icon-65.png')}
 							style={{width: 100, height: 100, marginVertical: 24}} />
 					</View>
 
@@ -118,7 +131,7 @@ export default class Home extends React.Component {
 					
 					<Card style={{marginTop: 16}}>
 						<Form>
-							<Item>
+							<Item error={this.state.showError && !this.state.tinggiBadan ? true : false}>
 								<Icon active type="MaterialCommunityIcons" name='human' />
 								<Input placeholder="Tinggi Badan (cm)"
 									keyboardType="number-pad"
@@ -127,7 +140,8 @@ export default class Home extends React.Component {
 									onSubmitEditing={this.calculateIMT} />
 							</Item>
 
-							<Item style={{borderBottomWidth: 0}}>
+							<Item style={{borderBottomWidth: 0}}
+								error={this.state.showError && !this.state.beratBadan ? true : false}>
 								<Icon active type="FontAwesome5" name='weight' />
 								<Input placeholder="Berat Badan (kg)"
 									keyboardType="number-pad"
